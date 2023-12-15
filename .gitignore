@@ -1,0 +1,33 @@
+# Node.js
+/node_modules
+
+# Dependency directories
+jspm_packages/
+bower_components/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+
+# Visual Studio Code configuration
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Configuration files
+config/*.js
+
+# Build directories
+build/
+dist/
