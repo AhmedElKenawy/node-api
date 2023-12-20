@@ -1,9 +1,102 @@
 // src/controllers/orderController.js
 
 const Order = require("../models/Order");
+const moment = require("moment");
 
 // Controller for handling order-related operations
+const getWeeklyReport = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    // Convert string dates to MongoDB ISODate
+    const startISODate = startDate ? new Date(moment('2023-12-16T10:53:12.823+00:00').startOf("day")) : new Date();
+    const endISODate = endDate ? new Date(moment("2023-12-22T10:53:12.823+00:00").endOf("day")) : new Date();
+    console.log("===?");
+    const weeklyReport = await Order.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: startISODate,
+            $lte: endISODate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          total: { $sum: "$total" },
+          totalPaid: { $sum: "$paid" },
+          totalRemains: { $sum: "$remains" },
+          sat: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 7] }, "$price", 0] } },
+          sun: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 1] }, "$price", 0] } },
+          mon: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 2] }, "$price", 0] } },
+          tue: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 3] }, "$price", 0] } },
+          wed: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 4] }, "$price", 0] } },
+          thu: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 5] }, "$price", 0] } },
+          fri: { $sum: { $cond: [{ $eq: [{ $dayOfWeek: "$date" }, 6] }, "$price", 0] } },
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // Assuming the collection name is 'users'
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$user.name", // Assuming 'username' is the field representing the user's name
+          total: "$total",
+          totalPaid: "$totalPaid",
+          totalRemains: "$totalRemains",
+          sat: "$sat",
+          sun: "$sun",
+          mon: "$mon",
+          tue: "$tue",
+          wed: "$wed",
+          thu: "$thu",
+          fri: "$fri",
+        },
+      },
+    ]);
 
+    // Calculate the totals for all users
+    const totalReport = await Order.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: startISODate,
+            $lte: endISODate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$total" },
+          totalPaid: { $sum: "$paid" },
+          totalRemains: { $sum: "$remains" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const [total] = totalReport;
+
+    res.json({ userReport: weeklyReport, report: total });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 // Get all orders with pagination
 const getAllOrders = async (req, res) => {
   const { page = 1, pageSize = 10 } = req.query;
@@ -119,4 +212,5 @@ module.exports = {
   createOrder,
   updateOrderById,
   deleteOrderById,
+  getWeeklyReport,
 };

@@ -8,6 +8,7 @@ const orderController = require('../controllers/orderController');
 router.get('/', orderController.getAllOrders);
 
 // Get order by ID
+router.get('/weekly-report', orderController.getWeeklyReport);
 router.get('/:id', orderController.getOrderById);
 
 // Create a new order
