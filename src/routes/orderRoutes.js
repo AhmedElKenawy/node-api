@@ -9,6 +9,7 @@ router.get('/', orderController.getAllOrders);
 
 // Get order by ID
 router.get('/weekly-report', orderController.getWeeklyReport);
+router.get('/weekly-report-export', orderController.exportWeeklyReport);
 router.get('/:id', orderController.getOrderById);
 
 // Create a new order
