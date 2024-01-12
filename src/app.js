@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const cors = require("cors");
 
@@ -30,5 +31,8 @@ app.use(
 );
 app.use("/users", userRoutes);
 app.use("/orders", orderRoutes);
+app.use('/auth', authRoutes);
+
+
 
 module.exports = app;
