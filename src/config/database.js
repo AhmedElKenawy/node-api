@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 // Connection URI for local MongoDB instance
-const MONGO_URI = 'mongodb://0.0.0.0:27017/shabacy';
+const MONGO_URI = 'mongodb+srv://ahmedalkenawy20:MGEJSVSMgitZWtfL@cluster0.kt0mdr2.mongodb.net/shabacy';
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
