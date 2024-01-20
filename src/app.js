@@ -25,7 +25,8 @@ db.once("open", () => {
 // Routes
 app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: ['http://18.194.53.25',"http://localhost:4200"],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  
     credentials: true, // You may need to set this if you're using cookies or authentication
   })
 );
