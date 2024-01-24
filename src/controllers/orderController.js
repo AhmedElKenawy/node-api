@@ -105,13 +105,16 @@ const getWeeklyReportData = async (req) => {
 };
 
 const getAllOrders = async (req, res) => {
-  const { page = 1, pageSize = 10 } = req.query;
-
+  const { page = 1, pageSize = 10 , filter } = req.query;
   try {
+    let query = {};
+    if(filter){
+      query = JSON.parse(filter)
+    }
     if (pageSize) {
       let orders;
       const skip = (page - 1) * pageSize;
-      orders = await Order.find().populate(populateOrder).skip(skip).limit(Number(pageSize));
+      orders = await Order.find(query).populate(populateOrder).skip(skip).limit(Number(pageSize));
       const totalCount = await Order.countDocuments();
       res.json({ result: mapOrders(orders), totalCount });
     } else {
@@ -139,7 +142,7 @@ const getOrderById = async (req, res) => {
 
 // Create a new order
 const createOrder = async (req, res) => {
-  const { userId, date, quantity, paid, price } = req.body;
+  const { userId, date, quantity, paid, price , category  , period} = req.body;
   try {
     const total = quantity * price;
     const _order = {
@@ -150,6 +153,8 @@ const createOrder = async (req, res) => {
       price,
       paid,
       remains: total - paid,
+      period : period,
+      category 
     };
     const newOrder = new Order(_order);
     const savedOrder = await newOrder.save();
