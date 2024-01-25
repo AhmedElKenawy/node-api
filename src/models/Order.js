@@ -1,6 +1,7 @@
 // src/models/Order.js
 
 const mongoose = require("mongoose");
+const User = require("./User");
 
 const orderSchema = new mongoose.Schema(
   {
@@ -17,8 +18,8 @@ const orderSchema = new mongoose.Schema(
     period: {
       type: String,
       required: true,
-      enum: ["AM", "PM",],
-      default : "AM"
+      enum: ["AM", "PM"],
+      default: "AM",
     },
     orderNumber: {
       type: Number,
@@ -61,13 +62,22 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-orderSchema.pre('save', async function (next) {
+orderSchema.pre("save", async function (next) {
   try {
     if (!this.orderNumber) {
-      // If orderNumber is not provided, generate it based on the count
       const count = await this.constructor.countDocuments();
       this.orderNumber = count + 1;
     }
+    const user = await User.findById(this.userId);
+    if (!user) {
+      return next(new Error("User not found"));
+    }
+    if (!user.deposits) user.deposits = 0;
+    const orderRemains = this.remains || 0  - user.deposits;
+    user.deposits -= this.remains;
+    await user.save();
+    this.remains = orderRemains;
+
     next();
   } catch (error) {
     next(error);

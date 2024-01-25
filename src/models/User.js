@@ -10,7 +10,31 @@ const userSchema = new mongoose.Schema({
   mobile: {
     type: String,
     required: true,
-  }
+  },
+  address  : {
+    type: String,
+  },
+  city  : {
+    type: String,
+  },
+  credit  : {
+    type: Number,
+    default: 0
+  },
+  deposits  : {
+    type: Number,
+    default: 0
+  },
+  debit  : {
+    type: Number,
+    default: 0
+  },
+  admin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
+    required: false,
+  },
+  
 },
 { timestamps: true , toJSON: {
   transform: function (doc, ret) {
