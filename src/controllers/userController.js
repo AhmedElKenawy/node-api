@@ -2,17 +2,22 @@
 const User = require("../models/User");
 
 const getAllUsers = async (req, res) => {
-  
+  console.log(req.user);
   try {
+    const query ={}
     const { page = 1, pageSize } = req.query;
-
+    const {user} =  req;
+    console.log(user);
+    if(user.role == 'EMPLOYEE'){
+      query.admin =  user._id
+    }
     if(pageSize){
       const skip = (page - 1) * pageSize;
-      const users = await User.find().skip(skip).limit(Number(pageSize));
+      const users = await User.find(query).populate(['admin']).skip(skip).limit(Number(pageSize));
       const totalCount = await User.countDocuments();
       res.json({ result: users, totalCount });
     }else{
-      const users = await User.find()
+      const users = await User.find(query)
       res.json(users);
     }
   } catch (error) {
@@ -36,9 +41,9 @@ const getUserById = async (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
-  const { name, mobile } = req.body;
+  const { name, mobile  , admin} = req.body;
   try {
-    const newUser = new User({ name, mobile });
+    const newUser = new User({ name, mobile  , admin });
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
@@ -47,11 +52,11 @@ const createUser = async (req, res) => {
 };
 
 const editUser = async (req, res) => {
-  const { name, mobile } = req.body;
+  const { name, mobile  , admin} = req.body;
   const { id } = req.params;
   try {
     if (id) {
-      const savedUser = await User.updateOne({ _id: id }, { name, mobile });
+      const savedUser = await User.updateOne({ _id: id }, { name, mobile , admin });
       res.status(201).json(savedUser);
     } else {
       res.status(201).json("Missing Id ");

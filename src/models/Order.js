@@ -10,6 +10,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      required: true,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

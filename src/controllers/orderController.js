@@ -185,11 +185,41 @@ const updateOrderById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getAveragePricePerQuantity = async (filter) => {
+  try {
+    const pipeline = [
+      {
+        $match: {
+          $and :[
+            {period : filter.period},
+          ]
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          averagePricePerQuantity: {
+            $avg: {
+              $divide: ["$price", "$quantity"],
+            },
+          },
+        },
+      },
+    ];
 
+    const result = await Order.aggregate(pipeline);
+    console.log(result);
+
+    if (result.length === 0) {
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+};
 const populateOrder = {
   path: "userId",
   model: "User",
-  select: "name phone",
   options: { lean: true },
 };
 const mapOrders = (orders) => {

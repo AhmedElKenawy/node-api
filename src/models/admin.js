@@ -5,10 +5,18 @@ const adminSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true  },
     role: { type: String , enum: ["ADMIN", "SUPER_ADMIN", "EMPLOYEE"], default: "EMPLOYEE" }
   },
-  { collection: "admin" }
+  { collection: "admin" ,
+  timestamps: true , toJSON: {
+    transform: function (doc, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+    },
+  }
+}
 ); // Set the collection name to 'admin'
 
 // Hash the password before saving to the database
