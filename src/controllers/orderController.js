@@ -142,7 +142,7 @@ const getOrderById = async (req, res) => {
 
 // Create a new order
 const createOrder = async (req, res) => {
-  const { userId, date, quantity, paid, price , category  , period} = req.body;
+  const { userId, date, quantity, paid, price , category  , period , adminId} = req.body;
   try {
     const total = quantity * price;
     const _order = {
@@ -154,7 +154,8 @@ const createOrder = async (req, res) => {
       paid,
       remains: total - paid,
       period : period,
-      category 
+      category ,
+      adminId
     };
     const newOrder = new Order(_order);
     const savedOrder = await newOrder.save();
