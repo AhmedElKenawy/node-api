@@ -155,7 +155,7 @@ const createOrder = async (req, res) => {
       remains: total - paid,
       period : period,
       category ,
-      adminId
+      admin : adminId
     };
     const newOrder = new Order(_order);
     const savedOrder = await newOrder.save();
