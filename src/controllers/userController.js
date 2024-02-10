@@ -2,7 +2,6 @@
 const User = require("../models/User");
 
 const getAllUsers = async (req, res) => {
-  console.log(req.user);
   try {
     const query ={}
     const { page = 1, pageSize } = req.query;
@@ -17,7 +16,7 @@ const getAllUsers = async (req, res) => {
       const totalCount = await User.countDocuments();
       res.json({ result: users, totalCount });
     }else{
-      const users = await User.find(query)
+      const users = await User.find(query).populate(['admin'])
       res.json(users);
     }
   } catch (error) {
