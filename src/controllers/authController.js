@@ -3,7 +3,9 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/admin');
-const secretKey = 'shabacy-apiR'
+const secretKey = 'shabacy-apiR';
+const Order = require("../models/Order");
+
 
 // Register a new user
 const register =  async (req, res) => {
@@ -122,6 +124,9 @@ const deleteUserById = async (req, res) => {
 
     if (!deletedUser) {
       return res.status(404).json({ message: 'Admin not found' });
+    }
+    if(id){
+      Order
     }
 
     res.json({ message: 'Admin deleted successfully', deletedUser });

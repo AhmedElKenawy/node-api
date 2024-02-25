@@ -1,5 +1,6 @@
 
 const User = require("../models/User");
+const Order = require("../models/Order");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -69,10 +70,14 @@ const deleteUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
+
     const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) {
       return res.status(404).json({ message: 'User not found' });
+    }
+    if(id){
+      await Order.deleteMany({ admin: id });
     }
 
     res.json({ message: 'User deleted successfully', deletedUser });
