@@ -1,23 +1,22 @@
-
 const User = require("../models/User");
 const Order = require("../models/Order");
 
 const getAllUsers = async (req, res) => {
   try {
-    const query ={}
+    const query = {};
     const { page = 1, pageSize } = req.query;
-    const {user} =  req;
+    const { user } = req;
     console.log(user);
-    if(user.role == 'EMPLOYEE'){
-      query.admin =  user._id
+    if (user.role == "EMPLOYEE") {
+      query.admin = user._id;
     }
-    if(pageSize){
+    if (pageSize) {
       const skip = (page - 1) * pageSize;
-      const users = await User.find(query).populate(['admin']).skip(skip).limit(Number(pageSize));
+      const users = await User.find(query).populate(["admin"]).skip(skip).limit(Number(pageSize));
       const totalCount = await User.countDocuments();
       res.json({ result: users, totalCount });
-    }else{
-      const users = await User.find(query).populate(['admin'])
+    } else {
+      const users = await User.find(query).populate(["admin"]);
       res.json(users);
     }
   } catch (error) {
@@ -41,9 +40,9 @@ const getUserById = async (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
-  const { name, mobile  , admin} = req.body;
+  const { name, mobile, admin } = req.body;
   try {
-    const newUser = new User({ name, mobile  , admin });
+    const newUser = new User({ name, mobile, admin });
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
@@ -52,14 +51,40 @@ const createUser = async (req, res) => {
 };
 
 const editUser = async (req, res) => {
-  const { name, mobile  , admin} = req.body;
+  const { name, mobile, admin } = req.body;
   const { id } = req.params;
   try {
     if (id) {
-      const savedUser = await User.updateOne({ _id: id }, { name, mobile , admin });
+      const savedUser = await User.updateOne({ _id: id }, { name, mobile, admin });
       res.status(201).json(savedUser);
     } else {
       res.status(201).json("Missing Id ");
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const addBalance = async (req, res) => {
+  const { balance } = req.body;
+  const { id } = req.params;
+  try {
+    if (isNaN(balance)) {
+      res.status(404).json("In valid balance ");
+    } else {
+      if (id) {
+        const user = await User.findById(id);
+        if (user) {
+          const { deposits } = user;
+          const newDeposit = (deposits || 0) + balance;
+          const savedUser = await User.updateOne({ _id: id }, { deposits: newDeposit });
+          res.status(201).json(savedUser);
+        } else {
+          res.status(201).json("No user ");
+        }
+      } else {
+        res.status(201).json("Missing Id ");
+      }
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -70,17 +95,16 @@ const deleteUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-
     const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
-    if(id){
+    if (id) {
       await Order.deleteMany({ admin: id });
     }
 
-    res.json({ message: 'User deleted successfully', deletedUser });
+    res.json({ message: "User deleted successfully", deletedUser });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -91,5 +115,6 @@ module.exports = {
   getUserById,
   createUser,
   editUser,
-  deleteUserById
+  deleteUserById,
+  addBalance
 };
